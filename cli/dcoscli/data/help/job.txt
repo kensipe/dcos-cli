@@ -4,6 +4,7 @@ Description:
     Usage:
         dcos job [--help][--version][--config-schema][--info]
         dcos job add <job-file>
+        dcos job add <job-id> <job-desc>
         dcos job remove <job-id> [--stopCurrentJobRuns]
         dcos job show <job-id>
         dcos job update <job-file>

@@ -6,7 +6,7 @@ import six
 import dcoscli
 import docopt
 import pkg_resources
-from dcos import cmds, config, emitting, http, options, util
+from dcos import cmds, config, emitting, http, options, util, jsonitem
 from dcos.errors import (DCOSException, DCOSHTTPException)
 from dcoscli import tables
 from dcoscli.subcommand import default_command_info, default_doc
@@ -94,13 +94,18 @@ def _cmds():
 
         cmds.Command(
             hierarchy=['job', 'add'],
-            arg_keys=['<job-file>'],
+            arg_keys=['<job-id>', '<job-desc>'],
             function=_add_job),
+
+        cmds.Command(
+            hierarchy=['job', 'add'],
+            arg_keys=['<job-file>'],
+            function=_add_job_file),
 
         cmds.Command(
             hierarchy=['job', 'update'],
             arg_keys=['<job-file>'],
-            function=_update_job),
+            function=_update_job_file),
 
         cmds.Command(
             hierarchy=['job', 'show'],
@@ -435,7 +440,36 @@ def _add_schedule(job_id, schedule_file):
     return _add_schedules(job_id, schedules)
 
 
-def _add_job(job_file):
+def _add_job(job_id, job_desc):
+    """
+    :param job_id: id of job
+    :type job_id: str
+    :param job_desc: description of the job
+    :type job_desc: str
+    :returns: process return code
+    :rtype: int
+    """
+
+    full_json = {}
+    full_json['id'] = jsonitem.clean_value(job_id)
+    full_json['description'] = jsonitem.clean_value(job_desc)
+    full_json['run'] = {}
+    full_json['run']['cmd'] = "sleep 100"
+
+    try:
+        response = _post_job(full_json)
+        emitter.publish("Job ID: '{}' added.".format(job_id))
+    except DCOSHTTPException as e:
+        if(e.response.status_code == 409):
+            emitter.publish("Job ID: '{}' already exists".format(job_id))
+        else:
+            emitter.publish(e)
+            emitter.publish("Error running job: '{}'".format(job_id))
+        return 1
+
+    return 0
+
+def _add_job_file(job_file):
     """
     :param job_file: optional filename for the application resource
     :type job_file: str
@@ -465,6 +499,7 @@ def _add_job(job_file):
             emitter.publish("Job ID: '{}' already exists".format(job_id))
         else:
             emitter.publish("Error running job: '{}'".format(job_id))
+        return 1
 
     if (schedules is not None and job_added):
         return _add_schedules(job_id, schedules)
@@ -472,7 +507,7 @@ def _add_job(job_file):
     return 0
 
 
-def _update_job(job_file):
+def _update_job_file(job_file):
     """
     :param job_file: filename for the application resource
     :type job_file: str
@@ -749,7 +784,7 @@ def _get_timeout():
     :returns: timout value for API calls
     :rtype: str
     """
-    
+
     # if timeout is not passed, try to read `core.timeout`
     # if `core.timeout` is not set, default to 3 min.
     timeout = config.get_config_val('core.timeout')
