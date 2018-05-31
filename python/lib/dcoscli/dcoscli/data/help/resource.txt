@@ -1,0 +1,18 @@
+Description:
+    View DC/OS resource information and set Quotas
+
+Usage:
+    dcos resource --help
+    dcos resource --info
+    dcos resource [--json]
+    dcos resource quota [--json]
+    
+Commands:
+    describe
+        Get specific details for packages.
+
+Options:
+    -h, --help
+        Print usage.
+    --info
+        Print a short description of this subcommand.

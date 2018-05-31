@@ -163,6 +163,53 @@ def app_task_table(tasks):
 
     return tb
 
+def resource_roles_table(roles):
+    """Returns a PrettyTable representation of mesos roles.
+
+    :param roles: roles to render
+    :type roles: [dict]
+    :rtype: PrettyTable
+    """
+
+    fields = OrderedDict([
+        ("ROLE", lambda t: t["name"]),
+        ("CPU", lambda t: t["resources"]["cpus"]),
+        ("MEM", lambda t: t["resources"]["mem"]),
+        ("DISK", lambda t: t["resources"]["disk"]),
+        ("GPUS", lambda t: t["resources"]["gpus"])
+    ])
+
+    tb = table(fields, roles, sortby="ROLE")
+    tb.align["ROLE"] = "l"
+    tb.align["CPU"] = "r"
+    tb.align["MEM"] = "r"
+    tb.align["DISK"] = "r"
+    tb.align["GPUS"] = "r"
+    return tb
+
+def resource_quota_table(roles):
+    """Returns a PrettyTable representation of mesos quota.
+
+    :param roles: tasks to render
+    :type roles: [dict]
+    :rtype: PrettyTable
+    """
+
+    fields = OrderedDict([
+        ("ROLE", lambda t: t["name"]),
+        ("CPU", lambda t: t["quota"]["guarantee"]["cpus"]),
+        ("MEM", lambda t: t["quota"]["guarantee"]["mem"]),
+        ("DISK", lambda t: t["quota"]["guarantee"]["disk"]),
+        ("GPUS", lambda t: t["quota"]["guarantee"]["gpus"])
+    ])
+
+    tb = table(fields, roles, sortby="ROLE")
+    tb.align["ROLE"] = "l"
+    tb.align["CPU"] = "r"
+    tb.align["MEM"] = "r"
+    tb.align["DISK"] = "r"
+    tb.align["GPUS"] = "r"
+    return tb
 
 def deployment_table(deployments):
     """Returns a PrettyTable representation of the provided marathon

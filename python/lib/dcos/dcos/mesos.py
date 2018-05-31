@@ -117,6 +117,26 @@ class DCOSClient(object):
         url = self.master_url('master/state.json')
         return http.get(url, timeout=self._timeout).json()
 
+    def get_quota(self):
+        """Get the Mesos master quota json object
+
+        :returns: Mesos' master quota json object
+        :rtype: dict
+        """
+
+        url = self.master_url('master/quota')
+        return http.get(url, timeout=self._timeout).json()
+
+    def get_roles(self):
+        """Get the Mesos master role json object
+
+        :returns: Mesos' master role json object
+        :rtype: dict
+        """
+
+        url = self.master_url('master/roles')
+        return http.get(url, timeout=self._timeout).json()
+
     def get_slave_state(self, slave_id, private_url):
         """Get the Mesos slave state json object
 

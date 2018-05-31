@@ -155,7 +155,7 @@ def default_subcommands():
     """
 
     return ["auth", "cluster", "config", "help", "job",
-            "marathon", "node", "package", "service", "task"]
+            "marathon", "node", "package", "resource", "service", "task"]
 
 
 def documentation(executable_path):
